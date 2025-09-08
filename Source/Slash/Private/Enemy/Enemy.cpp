@@ -36,6 +36,16 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AEnemy::Die()
+{
+	//TODO: Play death animation
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && DeathMontage) {
+		AnimInstance->Montage_Play(DeathMontage);
+		AnimInstance->Montage_JumpToSection("Death1", DeathMontage);
+		EDeathPose = EDeathPose::EDP_Death1;
+	}
+}
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -60,9 +70,14 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	// DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
-	DirectionalHitReact(ImpactPoint);
+	// DirectionalHitReact(ImpactPoint);
+	if(Attributes && Attributes->IsAlive()) {
+		DirectionalHitReact(ImpactPoint);
+	}else{
+		Die();
+	}
 
 	if(HitSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);

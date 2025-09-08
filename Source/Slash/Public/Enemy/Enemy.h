@@ -7,6 +7,7 @@
 #include "Interface/HitInterface.h"
 #include "Sound/SoundWave.h"
 #include "Particles/ParticleSystem.h"
+#include "Characters/CharacterTypes.h"
 #include "Enemy.generated.h"
 
 class UAnimMontage;
@@ -33,7 +34,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void Die();
+
 	void PlayHitReactMontage(const FName& SectionName);
+
+	UPROPERTY(BluePrintReadOnly)
+	EDeathPose DeathPose = EDeathPose::EDP_Alive;
+	
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Attribute, meta = (AllowPrivateAccess = "true"))
@@ -42,8 +49,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Attribute, meta = (AllowPrivateAccess = "true"))
 	UHealthBarComponent* HealthBarWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montage, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundWave* HitSound;
