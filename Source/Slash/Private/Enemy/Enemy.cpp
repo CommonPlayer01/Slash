@@ -33,6 +33,11 @@ AEnemy::AEnemy()
 
 }
 
+void AEnemy::PatrolTimerFinished()
+{
+	MoveToTarget(PatrolTarget);
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
@@ -42,17 +47,20 @@ void AEnemy::BeginPlay()
 	}
 
 	EnemyController = Cast<AAIController>(GetController());
-	FAIMoveRequest MoveRequest;
-	MoveRequest.SetGoalActor(PatrolTarget);
-	MoveRequest.SetAcceptanceRadius(15.f);
-	FNavPathSharedPtr NavPath;
-	EnemyController->MoveTo(MoveRequest, &NavPath);
-	TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
 
-	for(auto& Point : PathPoints) {
-		const FVector& PointLocation = Point.Location;
-		DrawDebugSphere(GetWorld(), PointLocation, 12.f, 12, FColor::Red, false, 10.f);
-	}
+	GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::PatrolTimerFinished, 5.0f);
+
+	//FAIMoveRequest MoveRequest;
+	//MoveRequest.SetGoalActor(PatrolTarget);
+	//MoveRequest.SetAcceptanceRadius(15.f);
+	//FNavPathSharedPtr NavPath;
+	//EnemyController->MoveTo(MoveRequest, &NavPath);
+	//TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
+
+	//for(auto& Point : PathPoints) {
+	//	const FVector& PointLocation = Point.Location;
+	//	DrawDebugSphere(GetWorld(), PointLocation, 12.f, 12, FColor::Red, false, 10.f);
+	//}
 }
 
 void AEnemy::Die()
@@ -77,6 +85,34 @@ void AEnemy::Die()
 	DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
 	return DistanceToTarget <= Radius;
 }
+ void AEnemy::MoveToTarget(AActor* Target)
+ {
+	if (EnemyController == nullptr || Target == nullptr) return;
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(PatrolTarget);
+	MoveRequest.SetAcceptanceRadius(15.f);
+	EnemyController->MoveTo(Target);
+ }
+ AActor* AEnemy::ChosePatrolTarget()
+ {
+	 if (InTargetRange(PatrolTarget, PatrolRadius)) {
+		 TArray<AActor*> ValidTargets;
+		 for (AActor* Target : PatrolTargets) {
+			 if (Target != PatrolTarget) {
+				 ValidTargets.AddUnique(Target);
+			 }
+		 }
+		 const int32 NumPatrolTargets = ValidTargets.Num();
+
+		 if (NumPatrolTargets > 0) {
+			 const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
+			 return  ValidTargets[TargetSelection];
+		 }
+		 
+
+	 }
+	 return nullptr;
+}
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -85,41 +121,37 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
 	}
 }
+
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(CombatTarget){
-		if(!InTargetRange(CombatTarget, combatRadius)) {
+	CheckCombatTarget();
+	CheckPatrolTarget();
+
+}
+
+void AEnemy::CheckPatrolTarget()
+{
+	if (PatrolTarget && EnemyController) {
+		if (InTargetRange(PatrolTarget, PatrolRadius)) {
+			PatrolTarget = ChosePatrolTarget();
+			const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
+			GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::PatrolTimerFinished, WaitTime);
+		}
+	}
+}
+
+void AEnemy::CheckCombatTarget()
+{
+	if (CombatTarget) {
+		if (!InTargetRange(CombatTarget, combatRadius)) {
 			CombatTarget = nullptr;
-			if(HealthBarWidget) {
+			if (HealthBarWidget) {
 				HealthBarWidget->SetVisibility(false);
 			}
 		}
 	}
-	if(PatrolTarget && EnemyController){
-		if(InTargetRange(PatrolTarget, PatrolRadius)) {
-			TArray<AActor*> ValidTargets;
-			for(AActor* Target : PatrolTargets) {
-				if(Target != PatrolTarget) {
-					ValidTargets.AddUnique(Target);
-				}
-			}
-			const int32 NumPatrolTargets = ValidTargets.Num();
-
-			if(NumPatrolTargets > 0) {
-				const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
-				AActor* Target = ValidTargets[TargetSelection];
-				PatrolTarget = Target;
-
-				FAIMoveRequest MoveRequest;
-				MoveRequest.SetGoalActor(PatrolTarget);
-				MoveRequest.SetAcceptanceRadius(15.f);
-				EnemyController->MoveTo(MoveRequest);
-			}
-		}
-	}
-
 }
 
 // Called to bind functionality to input
