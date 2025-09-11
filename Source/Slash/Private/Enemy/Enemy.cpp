@@ -9,6 +9,11 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/AttributeComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "AIController.h"
+#include "NavigationData.h"
+#include "Navigation/PathFollowingComponent.h"
+
+
 
 
 // Sets default values
@@ -36,6 +41,19 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	if(HealthBarWidget) {
 		HealthBarWidget->SetVisibility(false);
+	}
+
+	EnemyController = Cast<AAIController>(GetController());
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(PatrolTarget);
+	MoveRequest.SetAcceptanceRadius(15.f);
+	FNavPathSharedPtr NavPath;
+	EnemyController->MoveTo(MoveRequest, &NavPath);
+	TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
+
+	for(auto& Point : PathPoints) {
+		const FVector& PointLocation = Point.Location;
+		DrawDebugSphere(GetWorld(), PointLocation, 12.f, 12, FColor::Red, false, 10.f);
 	}
 }
 

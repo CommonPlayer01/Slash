@@ -37,6 +37,11 @@ ASlashCharacter::ASlashCharacter()
 	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
+
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationPitch = false;
 }
 
 // Called when the game starts or when spawned
