@@ -177,6 +177,17 @@ void AEnemy::CheckCombatTarget()
 			EnemyState = EEnemyState::EES_Patrolling;
 			GetCharacterMovement()->MaxWalkSpeed = 125.f;
 			MoveToTarget(PatrolTarget);
+			UE_LOG(LogTemp, Warning, TEXT("Lost Interest"));
+		}
+		else if (!InTargetRange(CombatTarget, attackRadius) && EnemyState != EEnemyState::EES_Chasing) {
+			EnemyState = EEnemyState::EES_Chasing;
+			GetCharacterMovement()->MaxWalkSpeed = 300.f;
+			MoveToTarget(CombatTarget);
+			UE_LOG(LogTemp, Warning, TEXT("Chase Player"));
+		}
+		else if (InTargetRange(CombatTarget, attackRadius) && EnemyState != EEnemyState::EES_Attacking) {
+			EnemyState = EEnemyState::EES_Attacking;
+			UE_LOG(LogTemp, Warning, TEXT("Attack"));
 		}
 	}
 }
