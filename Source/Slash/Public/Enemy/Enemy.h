@@ -13,6 +13,7 @@
 class UAnimMontage;
 class UAttributeComponent;
 class UHealthBarComponent;
+class UPawnSensingComponent;
 
 
 UCLASS()
@@ -39,7 +40,10 @@ protected:
 	void Die();
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
-	AActor* ChosePatrolTarget();
+	AActor* ChoosePatrolTarget();
+
+	UFUNCTION()
+	void PawnSeen(APawn* SeenPawn);
 
 	void PlayHitReactMontage(const FName& SectionName);
 
@@ -53,6 +57,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Attribute, meta = (AllowPrivateAccess = "true"))
 	UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensing;
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* HitReactMontage;
@@ -79,7 +86,7 @@ private:
 	UPROPERTY()
 	class AAIController* EnemyController;
 
-	UPROPERTY(EditInstanceOnly, Category ="AI Navigation")
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation", BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	AActor* PatrolTarget;
 
 	UPROPERTY(EditInstanceOnly, Category ="AI Navigation")
@@ -96,4 +103,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float WaitMax = 10.f;
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 };

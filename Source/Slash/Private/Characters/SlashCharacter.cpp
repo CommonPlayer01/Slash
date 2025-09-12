@@ -48,7 +48,7 @@ ASlashCharacter::ASlashCharacter()
 void ASlashCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Tags.Add(FName("SlashCharacter"));
 }
 
 // Called every frame
