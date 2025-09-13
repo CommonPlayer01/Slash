@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Characters/BaseCharacter.h"
 #include "Interface/HitInterface.h"
 #include "Sound/SoundWave.h"
 #include "Particles/ParticleSystem.h"
@@ -17,7 +17,7 @@ class UPawnSensingComponent;
 
 
 UCLASS()
-class SLASH_API AEnemy : public ACharacter, public IHitInterface
+class SLASH_API AEnemy : public ABaseCharacter, public IHitInterface
 {
 	GENERATED_BODY()
 
@@ -85,7 +85,6 @@ private:
 	/*
 		Navigation
 	*/
-
 	UPROPERTY()
 	class AAIController* EnemyController;
 

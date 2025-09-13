@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/CharacterTypes.h"
 #include "GameFramework/Character.h"
+#include "Characters/BaseCharacter.h"
 #include "SlashCharacter.generated.h"
 
 
@@ -18,7 +19,7 @@ class UAnimMontage;
 
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ACharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -32,8 +33,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -86,8 +86,7 @@ private:
 	UPROPERTY(VisibleInstanceOnly);
 	AItem* OverlappingItem;
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon);
-	AWeapon* EquippedWeapon;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = Montage)
 	UAnimMontage* AttackMontage;

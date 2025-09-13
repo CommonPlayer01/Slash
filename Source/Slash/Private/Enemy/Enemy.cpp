@@ -127,7 +127,7 @@ void AEnemy::Die()
 	 if (SeenPawn->ActorHasTag("SlashCharacter")) {
 		 EnemyState = EEnemyState::EES_Chasing;
 		 GetWorldTimerManager().ClearTimer(PatrolTimer);
-		 GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		 GetCharacterMovement()->MaxWalkSpeed = 600.f;
 		 CombatTarget = SeenPawn;
 		 MoveToTarget(CombatTarget);
 		 UE_LOG(LogTemp, Warning, TEXT("Seen Pawn, now Chasing"));
@@ -181,7 +181,7 @@ void AEnemy::CheckCombatTarget()
 		}
 		else if (!InTargetRange(CombatTarget, attackRadius) && EnemyState != EEnemyState::EES_Chasing) {
 			EnemyState = EEnemyState::EES_Chasing;
-			GetCharacterMovement()->MaxWalkSpeed = 300.f;
+			GetCharacterMovement()->MaxWalkSpeed = 600.f;
 			MoveToTarget(CombatTarget);
 			UE_LOG(LogTemp, Warning, TEXT("Chase Player"));
 		}
@@ -267,5 +267,8 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AC
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercentage());
 	}
 	CombatTarget = EventInstigator->GetPawn();
+	EnemyState = EEnemyState::EES_Chasing;
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	MoveToTarget(CombatTarget);
     return DamageAmount;
 }
