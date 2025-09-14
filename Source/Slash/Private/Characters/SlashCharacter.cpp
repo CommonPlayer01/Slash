@@ -124,26 +124,32 @@ void ASlashCharacter::EKeyPressed() {
 
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if(OverlappingWeapon && !EquippedWeapon) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("pickup()"));
-		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
-
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-		OverlappingItem = nullptr;
-		EquippedWeapon = OverlappingWeapon;
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("pickup()"));
+		EquipWeapon(OverlappingWeapon);
 	}
 	else {
 		if(CanDisarm()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanDisarm()"));
-			PlayEquipMontage(FName("Unequip"));
-			CharacterState = ECharacterState::ECS_Unequipped;
-			ActionState = EActionState::EAS_EquippingWeapon;
+			Disarm();
 		}else if (CanArm()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanArm()"));
-			PlayEquipMontage(FName("Equip"));
-			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-			ActionState = EActionState::EAS_EquippingWeapon;
+			Arm();
 		}
 	}
+}
+
+void ASlashCharacter::Arm()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanArm()"));
+	PlayEquipMontage(FName("Equip"));
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+void ASlashCharacter::Disarm()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanDisarm()"));
+	PlayEquipMontage(FName("Unequip"));
+	CharacterState = ECharacterState::ECS_Unequipped;
+	ActionState = EActionState::EAS_EquippingWeapon;
 }
 
 
@@ -158,6 +164,14 @@ void ASlashCharacter::Attack() {
 		PlayAttackMontage(); 
 		ActionState = EActionState::EAS_Attacking;
 	}
+}
+
+void ASlashCharacter::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
 }
 
 void ASlashCharacter::AttackEnd() {
@@ -184,14 +198,14 @@ bool ASlashCharacter::CanDisarm() const {
 bool ASlashCharacter::CanArm() const {
 	return ActionState == EActionState::EAS_Unoccupied && CharacterState == ECharacterState::ECS_Unequipped && EquippedWeapon;
 }
-void ASlashCharacter::Disarm() {
+void ASlashCharacter::AttachWeaponToHand() {
 	if(EquippedWeapon) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: Disarm()"));
 
 		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
 	}
 }
-void ASlashCharacter::Arm() {
+void ASlashCharacter::AttachWeaponToBack() {
 	if(EquippedWeapon) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: Arm()"));
 

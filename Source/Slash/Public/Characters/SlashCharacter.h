@@ -24,58 +24,53 @@ class SLASH_API ASlashCharacter : public ABaseCharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ASlashCharacter();
-
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+
+
+
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
+
+	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void Die() override;
-
+	/** Callbacks for input	*/
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
 	void EKeyPressed();
+
 	virtual void Attack() override;
 
-	/*
-	*	Play Montage Functions
-	*/
+	/** Combat */
+	void EquipWeapon(AWeapon* Weapon);
 	virtual void AttackEnd() override;
+
 	virtual bool CanAttack() override;
-
-	void PlayEquipMontage(const FName& SectionName);
-
-	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
-
 	bool CanDisarm() const;
 	bool CanArm() const;
-
-	UFUNCTION(BlueprintCallable)
-	void Disarm();
-	UFUNCTION(BlueprintCallable)
 	void Arm();
+	void Disarm();
+	void PlayEquipMontage(const FName& SectionName);
+	virtual void Die() override;
 
 	UFUNCTION(BlueprintCallable)
-	void FinishEquipping();
-
+	void AttachWeaponToBack();
+	UFUNCTION(BlueprintCallable)
+	void AttachWeaponToHand();
 
 private:
-	
-	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
-
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	EActionState ActionState = EActionState::EAS_Unoccupied;
-
 	UPROPERTY(VisibleAnywhere);
 	USpringArmComponent* CameraBoom;
 
@@ -91,17 +86,12 @@ private:
 	UPROPERTY(VisibleInstanceOnly);
 	AItem* OverlappingItem;
 
-
-
-
-
 	UPROPERTY(EditDefaultsOnly, Category = Montage)
 	UAnimMontage* EquipMontage;
+	
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
-public:
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
-
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
-
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 	
 };

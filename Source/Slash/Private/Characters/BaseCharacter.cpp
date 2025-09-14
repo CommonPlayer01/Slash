@@ -93,11 +93,21 @@ bool ABaseCharacter::CanAttack()
 {
 	return false;
 }
+
+bool ABaseCharacter::IsAlive()
+{
+	return Attributes && Attributes->IsAlive();
+}
+
 void ABaseCharacter::AttackEnd() {
 
 }
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) {
-
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage) {
+		AnimInstance->Montage_Play(HitReactMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	}
 }
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint) {
 
