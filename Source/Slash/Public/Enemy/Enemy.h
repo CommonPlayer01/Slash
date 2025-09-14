@@ -80,6 +80,7 @@ protected:
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 	virtual void Attack() override;
+	virtual void AttackEnd() override;
 	
 
 	UFUNCTION()

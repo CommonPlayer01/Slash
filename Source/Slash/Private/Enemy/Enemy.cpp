@@ -79,6 +79,8 @@ void AEnemy::BeginPlay()
 
 void AEnemy::Die()
 {	
+	ClearPatrolTimer();
+	ClearAttackTimer();
 	PlayDeathMontage();
 	HideHealthBar();
 	DisableCapsule();
@@ -119,12 +121,7 @@ void AEnemy::Die()
 	 }
 	 return nullptr;
 }
- void AEnemy::Attack()
- {
-	 Super::Attack();
-	 PlayAttackMontage();
-	 //ActionState = EActionState::EAS_Attacking;
- }
+
 
  void AEnemy::PawnSeen(APawn* SeenPawn)
  {	
@@ -163,8 +160,7 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (IsDead()) {
-		//ClearPatrolTimer();
-		//ClearAttackTimer();
+
 		return;
 	}
 	if (EnemyState > EEnemyState::EES_Patrolling) {
@@ -262,11 +258,25 @@ void AEnemy::ClearAttackTimer()
 	GetWorldTimerManager().ClearTimer(AttackTimer);
 }
 
+void AEnemy::Attack()
+{
+	EnemyState = EEnemyState::EES_Engaged;
+	Super::Attack();
+	PlayAttackMontage();
+}
+
+void AEnemy::AttackEnd()
+{
+	EnemyState = EEnemyState::EES_NoState;
+	CheckCombatTarget();
+}
+
 bool AEnemy::CanAttack()
 {
 	return IsInsideAttackRadius() &&
 		!IsAttacking() &&
-		!IsDead();
+		!IsEngaged() &&
+		!IsDead();  
 }
 
 void AEnemy::StartAttackTimer()
