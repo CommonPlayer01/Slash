@@ -18,6 +18,8 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
+	ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootComponent = ItemMesh;
 	
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
@@ -101,8 +103,8 @@ void AItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	FString ComponentName = OverlappedComponent->GetName();
 	if(GEngine) {
 		
-		FString Message = FString::Printf(TEXT("AItem %s Component Begin Overlap with %s %s"), *ComponentName, *OtherActorName, *OtherComponentName);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+		//FString Message = FString::Printf(TEXT("AItem %s Component Begin Overlap with %s %s"), *ComponentName, *OtherActorName, *OtherComponentName);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
 		// UE_LOG(LogTemp, Warning, TEXT("Item Sphere Begin Overlap with %s"), *ComponentName);
 	}
 

@@ -38,20 +38,26 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Die() override;
+
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
 	void EKeyPressed();
-	void Attack();
+	virtual void Attack() override;
 
-	// Animation Montage
-	void playAttackMontage();
-	void playEquipMontage(const FName& SectionName);
+	/*
+	*	Play Montage Functions
+	*/
+	virtual void PlayAttackMontage() override;
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
 
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
-	bool CanAttack() const;
+	void PlayEquipMontage(const FName& SectionName);
+
+	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
 	bool CanDisarm() const;
 	bool CanArm() const;
 
@@ -88,8 +94,7 @@ private:
 
 
 
-	UPROPERTY(EditDefaultsOnly, Category = Montage)
-	UAnimMontage* AttackMontage;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = Montage)
 	UAnimMontage* EquipMontage;

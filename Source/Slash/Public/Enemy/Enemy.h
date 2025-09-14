@@ -4,20 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
-#include "Interface/HitInterface.h"
 #include "Sound/SoundWave.h"
 #include "Particles/ParticleSystem.h"
 #include "Characters/CharacterTypes.h"
 #include "Enemy.generated.h"
 
-class UAnimMontage;
 class UAttributeComponent;
 class UHealthBarComponent;
 class UPawnSensingComponent;
 
 
 UCLASS()
-class SLASH_API AEnemy : public ABaseCharacter, public IHitInterface
+class SLASH_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -26,14 +24,54 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void CheckPatrolTarget();
 	void CheckCombatTarget();
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	bool IsAttacking();
+
+	bool IsInsideAttackRadius();
+
+	void ChaseTarget();
+	void StartPatrolling();
+
+	bool IsOutsideAttackRadius();
+	bool IsChasing();
+	bool IsAlive();
+	bool IsDead() const;
+	bool IsOutsideCombatRadius();
+	bool IsEngaged() const;
+
+	void ClearPatrolTimer();
+	void ClearAttackTimer();
+
+	virtual bool CanAttack() override;
+
+	/*
+		Combat
+	*/
+	void StartAttackTimer();
+
+	FTimerHandle AttackTimer;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMin = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMax = 1.f;
+
+
+
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 
-	void DirectionalHitReact(const FVector& ImpactPoint);
+	void ShowHealthBar();
+	void HideHealthBar();
+	void LoseInterest();
+
+	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
+	virtual void HandleDamage(float DamageAmount) override;
 
+	virtual void Destroyed() override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -41,6 +79,8 @@ protected:
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
+	virtual void Attack() override;
+	virtual void PlayAttackMontage() override;
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
@@ -48,12 +88,19 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName);
 
 	UPROPERTY(BluePrintReadOnly)
-	EDeathPose DeathPose = EDeathPose::EDP_Alive;
-	
+	EDeathPose DeathPose;
+
+	UPROPERTY(BlueprintReadOnly)
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float PatrollingSpeed = 125.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ChasingSpeed = 400.f;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = Attribute, meta = (AllowPrivateAccess = "true"))
-	UAttributeComponent* Attributes;
+
 
 	UPROPERTY(VisibleAnywhere, Category = Attribute, meta = (AllowPrivateAccess = "true"))
 	UHealthBarComponent* HealthBarWidget;
@@ -61,17 +108,14 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* HitReactMontage;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* DeathMontage;
 
-	UPROPERTY(EditAnywhere, Category = Sounds)
-	USoundWave* HitSound;
 
-	UPROPERTY(EditAnywhere, Category = VisualsEffects)
-	UParticleSystem* HitParticles;
 
 	UPROPERTY()
 	AActor* CombatTarget;
@@ -106,5 +150,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float WaitMax = 10.f;
 
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
+
+
 };

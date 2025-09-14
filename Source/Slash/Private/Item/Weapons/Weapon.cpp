@@ -68,7 +68,7 @@ void AWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if (SlashCharacter) {
 
 		FString Message = FString::Printf(TEXT("Weapon %s Component Begin Overlap with %s %s"), *ComponentName, *SlashCharacter->GetName(), *OtherComponentName);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
 	}
 
 }
@@ -80,7 +80,7 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	//Debug
 	FString Message = FString::Printf(TEXT("Weapon Box Overlapping With %s %s"), *OtherActor->GetName(), *OtherComp->GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
 
 
 	const FVector Start = BoxTraceStart->GetComponentLocation();

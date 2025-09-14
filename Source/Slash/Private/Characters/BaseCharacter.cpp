@@ -1,34 +1,85 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/BaseCharacter.h"
+#include "Components/BoxComponent.h"
+#include "Components/AttributeComponent.h"
+#include "Item/Weapons/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 
-// Sets default values
 ABaseCharacter::ABaseCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 
 }
 
-// Called when the game starts or when spawned
+
+
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
+
 }
 
-// Called every frame
+void ABaseCharacter::Attack() {
+
+}
+
+void ABaseCharacter::Die() {
+
+}	
+
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
-void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+void ABaseCharacter::PlayAttackMontage() {
 
 }
+void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
+{
+	if (HitSound) {
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	}
+}
+
+void ABaseCharacter::SpawnHitParticles(const FVector& ImpactPoint)
+{
+	if (HitParticles) {
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, ImpactPoint);
+	}
+
+}
+
+void ABaseCharacter::HandleDamage(float DamageAmount)
+{
+	if (Attributes) {
+		Attributes->ReceiveDamage(DamageAmount);
+	}
+}
+
+bool ABaseCharacter::CanAttack()
+{
+	return false;
+}
+void ABaseCharacter::AttackEnd() {
+
+}
+void ABaseCharacter::PlayHitReactMontage(const FName& SectionName) {
+
+}
+void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint) {
+
+}
+void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox()) {
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoredActors.Empty(); 
+	}
+}
+
 

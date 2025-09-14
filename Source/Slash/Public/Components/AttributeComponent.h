@@ -35,7 +35,9 @@ private:
 	float MaxHealth = 100.0f;
 public:
 	void ReceiveDamage(float DamageAmount);
-	FORCEINLINE float GetHealthPercentage() const { return Health / MaxHealth; }
+	float GetHealthPercent();
+
+	
 	bool IsAlive();
 	FORCEINLINE float GetHealth() const { return Health; }
 };

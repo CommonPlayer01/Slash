@@ -51,6 +51,11 @@ void ASlashCharacter::BeginPlay()
 	Tags.Add(FName("SlashCharacter"));
 }
 
+void ASlashCharacter::Die()
+{
+
+}
+
 // Called every frame
 void ASlashCharacter::Tick(float DeltaTime)
 {
@@ -75,10 +80,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 }
 
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {
-	if(EquippedWeapon && EquippedWeapon->GetWeaponBox()) {
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeapon->IgnoredActors.Empty(); // Clear the array after each attack
-	}
+	Super::SetWeaponCollisionEnabled(CollisionEnabled);
 }
 
 
@@ -132,19 +134,20 @@ void ASlashCharacter::EKeyPressed() {
 	else {
 		if(CanDisarm()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanDisarm()"));
-			playEquipMontage(FName("Unequip"));
+			PlayEquipMontage(FName("Unequip"));
 			CharacterState = ECharacterState::ECS_Unequipped;
 			ActionState = EActionState::EAS_EquippingWeapon;
 		}else if (CanArm()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Item Name: CanArm()"));
-			playEquipMontage(FName("Equip"));
+			PlayEquipMontage(FName("Equip"));
 			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}
 }
 
-void ASlashCharacter::playAttackMontage(){
+void ASlashCharacter::PlayAttackMontage(){
+	Super::PlayAttackMontage();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance && AttackMontage) {
 		AnimInstance->Montage_Play(AttackMontage);
@@ -166,11 +169,12 @@ void ASlashCharacter::playAttackMontage(){
 
 
 void ASlashCharacter::Attack() {
+	Super::Attack();
 	/*if (CharacterState == ECharacterState::ECS_EquippedOneHandedWeapon) {
 		CharacterState = ECharacterState::ECS_Attacking;
 	}*/
 	if (CanAttack()) {
-		playAttackMontage();
+		PlayAttackMontage(); 
 		ActionState = EActionState::EAS_Attacking;
 	}
 }
@@ -179,12 +183,13 @@ void ASlashCharacter::AttackEnd() {
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
-bool ASlashCharacter::CanAttack() const{
+
+bool ASlashCharacter::CanAttack(){
 	return ActionState == EActionState::EAS_Unoccupied && CharacterState != ECharacterState::ECS_Unequipped;
 }
 
 
-void ASlashCharacter::playEquipMontage(const FName& SectionName) {
+void ASlashCharacter::PlayEquipMontage(const FName& SectionName) {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance && EquipMontage) {
 		AnimInstance->Montage_Play(EquipMontage);
