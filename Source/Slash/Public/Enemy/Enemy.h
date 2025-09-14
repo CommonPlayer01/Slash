@@ -80,15 +80,22 @@ protected:
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 	virtual void Attack() override;
-	virtual void PlayAttackMontage() override;
+	
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
 
 	void PlayHitReactMontage(const FName& SectionName);
 
+	virtual int32 PlayDeathMontage() override;
+
+	//TODO: Play death animation
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float DeathLifeSpan = 3.f;
+
 	UPROPERTY(BluePrintReadOnly)
-	EDeathPose DeathPose;
+	TEnumAsByte<EDeathPose> DeathPose;
+	//EDeathPose DeathPose;
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
@@ -110,10 +117,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> WeaponClass;
-
-
-	UPROPERTY(EditDefaultsOnly, Category = Montages, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* DeathMontage;
 
 
 

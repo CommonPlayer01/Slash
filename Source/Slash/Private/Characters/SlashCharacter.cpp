@@ -146,26 +146,7 @@ void ASlashCharacter::EKeyPressed() {
 	}
 }
 
-void ASlashCharacter::PlayAttackMontage(){
-	Super::PlayAttackMontage();
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AttackMontage) {
-		AnimInstance->Montage_Play(AttackMontage);
-		int32 Selection = FMath::RandRange(0, 1);
-		FName SelectionName = FName();
-		switch (Selection) {
-			case 0:
-				SelectionName = FName("Attack1");
-				break;
-			case 1:
-				SelectionName = FName("Attack2");
-				break;
-			default:
-				break;
-		}
-		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
-	}
-}
+
 
 
 void ASlashCharacter::Attack() {

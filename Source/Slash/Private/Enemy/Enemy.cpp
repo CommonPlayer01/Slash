@@ -78,17 +78,11 @@ void AEnemy::BeginPlay()
 }
 
 void AEnemy::Die()
-{
-	//TODO: Play death animation
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && DeathMontage) {
-		AnimInstance->Montage_Play(DeathMontage);
-		AnimInstance->Montage_JumpToSection("Death1", DeathMontage);
-		DeathPose = EDeathPose::EDP_Death1;
-	}
+{	
+	PlayDeathMontage();
 	HideHealthBar();
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(3.f);
+	DisableCapsule();
+	SetLifeSpan(DeathLifeSpan);
 }
  bool AEnemy::InTargetRange(AActor *Target, double Radius)
 {	
@@ -131,31 +125,7 @@ void AEnemy::Die()
 	 PlayAttackMontage();
 	 //ActionState = EActionState::EAS_Attacking;
  }
- void AEnemy::PlayAttackMontage()
- {
-	 Super::PlayAttackMontage();
 
-	 UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	 if (AnimInstance && AttackMontage) {
-		 AnimInstance->Montage_Play(AttackMontage);
-		 int32 Selection = FMath::RandRange(0, 2);
-		 FName SelectionName = FName();
-		 switch (Selection) {
-		 case 0:
-			 SelectionName = FName("Attack1");
-			 break;
-		 case 1:
-			 SelectionName = FName("Attack2");
-			 break;
-		 case 2:
-			 SelectionName = FName("Attack3");
-			 break;
-		 default:
-			 break;
-		 }
-		 AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
-	 }
- }
  void AEnemy::PawnSeen(APawn* SeenPawn)
  {	
 	 const bool bShouldChaseTarget =
@@ -175,6 +145,17 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 		AnimInstance->Montage_Play(HitReactMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
 	}
+}
+
+int32 AEnemy::PlayDeathMontage()
+{	
+	Super::PlayDeathMontage();
+	const int32 Selection = Super::PlayDeathMontage();
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if (Pose < EDeathPose::EDP_Max) {
+		DeathPose = Pose;
+	}
+	return Selection;
 }
 
 // Called every frame
