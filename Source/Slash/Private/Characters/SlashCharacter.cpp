@@ -82,6 +82,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
+	ActionState = EActionState::EAS_HitReaction;
 }
 
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {
@@ -220,5 +221,10 @@ void ASlashCharacter::AttachWeaponToBack() {
 }
 
 void ASlashCharacter::FinishEquipping() {
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::HitReactEnd()
+{
 	ActionState = EActionState::EAS_Unoccupied;
 }
