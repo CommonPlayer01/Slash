@@ -9,7 +9,6 @@
 #include "Interface/HitInterface.h"
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Weapon.h"
 
 AWeapon::AWeapon() {
 	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponBox"));
@@ -50,6 +49,10 @@ void AWeapon::DisableSphereCollision() {
 	if(Sphere){
 		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void AWeapon::PlayEquipSound()
+{
 }
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
@@ -94,7 +97,7 @@ void AWeapon::BoxTrace(FHitResult& BoxHit) {
 	ActorsToIgnore.Add(this);
 	ActorsToIgnore.Add(GetOwner());
 
-	for (AActor* Actor : IgnoreActors)
+	for (AActor* Actor : IgnoredActors)
 	{
 		ActorsToIgnore.AddUnique(Actor);
 	}
@@ -112,7 +115,7 @@ void AWeapon::BoxTrace(FHitResult& BoxHit) {
 		BoxHit,
 		true
 	);
-	IgnoreActors.AddUnique(BoxHit.GetActor());
+	IgnoredActors.AddUnique(BoxHit.GetActor());
 }
 
 void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -126,10 +129,15 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	FHitResult BoxHit;
 	BoxTrace(BoxHit);
 	if (BoxHit.GetActor()) {
+		if (ActorIsSameType(BoxHit.GetActor())) return;
 		UGameplayStatics::ApplyDamage(BoxHit.GetActor(), Damage, GetInstigator()->GetController(), this, UDamageType::StaticClass());
-		ExecuteGetHit();
+		ExecuteGetHit(BoxHit);
 		CreateFields(BoxHit.ImpactPoint);
 	}
+}
+bool AWeapon::ActorIsSameType(AActor* OtherActor)
+{
+	return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
 }
 void AWeapon::ExecuteGetHit(FHitResult& BoxHit) {
 	IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
@@ -138,6 +146,7 @@ void AWeapon::ExecuteGetHit(FHitResult& BoxHit) {
 		HitInterface->Execute_GetHit(BoxHit.GetActor(), BoxHit.ImpactPoint, GetOwner());
 	}
 }
+
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }

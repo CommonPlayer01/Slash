@@ -34,7 +34,7 @@ protected:
 	UFUNCTION()
 	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// bool ActorIsSameType(AActor* OtherActor);
+	 bool ActorIsSameType(AActor* OtherActor);
 
 	void ExecuteGetHit(FHitResult& BoxHit);
 
@@ -51,8 +51,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	FVector BoxTraceExtent = FVector(5.f);
 
-	// UPROPERTY(EditAnywhere, Category = "Weapon Properties")
-	// bool bShowBoxDebug = false;
+	 UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	 bool bShowBoxDebug = false;
 
 	// UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	// USoundBase* EquipSound;

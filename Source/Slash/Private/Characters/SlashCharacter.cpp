@@ -9,7 +9,6 @@
 #include "Item/Item.h"
 #include "Item/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
-#include "SlashCharacter.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
@@ -82,8 +81,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 
 void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) {
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
 }
 
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {

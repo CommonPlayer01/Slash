@@ -26,7 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	/** Combat */
-	//virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack();
 	virtual void Die();
 

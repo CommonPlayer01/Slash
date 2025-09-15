@@ -26,5 +26,5 @@ public:
 	//  If you use BlueprintImplementableEvent, you can only implement the function in Blueprints, not in C++.
 	//  If you use BlueprintNativeEvent, you must provide a default implementation in C++
 	UFUNCTION(BlueprintNativeEvent)
-	void GetHit(const FVector& ImpactPoint);
+	void GetHit(const FVector& ImpactPoint, AActor* Hitter);
 };

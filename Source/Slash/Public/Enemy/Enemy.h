@@ -27,7 +27,7 @@ public:
 	/** <AACtor> */
 
 	/** <IHitInterface>*/
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	/** <IHitInterface>*/
 
 
@@ -57,7 +57,6 @@ protected:
 
 
 	virtual int32 PlayDeathMontage() override;
-	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 

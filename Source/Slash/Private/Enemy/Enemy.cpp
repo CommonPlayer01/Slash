@@ -106,7 +106,7 @@ void AEnemy::Die()
 	if (EnemyController == nullptr || Target == nullptr) return;
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(PatrolTarget);
-	MoveRequest.SetAcceptanceRadius(60.f);
+	MoveRequest.SetAcceptanceRadius(130.f);
 	EnemyController->MoveTo(Target);
  }
  AActor* AEnemy::ChoosePatrolTarget()
@@ -308,20 +308,16 @@ void AEnemy::LoseInterest()
 
 
 
-void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	// DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
 	// DirectionalHitReact(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
 	ShowHealthBar();
-	if(Attributes && Attributes->IsAlive()) {
-		DirectionalHitReact(ImpactPoint);
-	}else{
-		Die();
-	}
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+
+
 
 }
 
@@ -332,43 +328,7 @@ void AEnemy::ShowHealthBar()
 	}
 }
 
-void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
-{
-	const FVector Forward = GetActorForwardVector();
-	const FVector ImapactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
-	const FVector ToHit = (ImapactLowered - GetActorLocation()).GetSafeNormal();
 
-	const double CosTheta = FVector::DotProduct(Forward, ToHit);
-	double Theta = FMath::Acos(CosTheta);
-	Theta = FMath::RadiansToDegrees(Theta);
-
-	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 60.f, 5.f, FColor::Green, 5.f, 2.f);
-
-	if (CrossProduct.Z < 0) {
-		Theta *= -1.f;
-	}
-
-	FName SectionName = FName();
-	if (Theta >= -45.f && Theta < 45.f) {
-		PlayHitReactMontage(FName("FromFront"));
-	}
-	else if (Theta >= 45.f && Theta < 135.f) {
-		PlayHitReactMontage(FName("FromRight"));
-	}
-	else if (Theta >= -135.f && Theta < -45.f) {
-		PlayHitReactMontage(FName("FromLeft"));
-	}
-
-	PlayHitReactMontage(SectionName);
-
-	if (GEngine) {
-		FString Message = FString::Printf(TEXT("Theta: %f"), Theta);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
-	}
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Green, 5.f, 2.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Orange, 5.f, 2.f);
-}
 
 
 
