@@ -49,6 +49,8 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
+	Tags.Add(FName("Enemy"));
+
 
 	//FAIMoveRequest MoveRequest;
 	//MoveRequest.SetGoalActor(PatrolTarget);
@@ -133,7 +135,7 @@ void AEnemy::Die()
  {	
 	 const bool bShouldChaseTarget =
 		 EnemyState == EEnemyState::EES_Patrolling &&
-		 SeenPawn->ActorHasTag("SlashCharacter");
+		 SeenPawn->ActorHasTag(FName("EngageableTarget"));
 	 
 	 if (bShouldChaseTarget) {
 		 CombatTarget = SeenPawn;

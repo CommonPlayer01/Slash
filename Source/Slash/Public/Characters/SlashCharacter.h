@@ -27,20 +27,20 @@ public:
 	ASlashCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// virtual void Jump() override;
+
+	// virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	// virtual void AddSouls(ASoul* Soul) override;
+	// virtual void AddGold(ATreasure* Treasure) override;
 
 
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 
 
-
-
-
-
-	UFUNCTION(BlueprintCallable)
-	void FinishEquipping();
 
 	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,11 +52,12 @@ protected:
 	void EKeyPressed();
 
 	virtual void Attack() override;
+	// void Dodge();
 
 	/** Combat */
 	void EquipWeapon(AWeapon* Weapon);
 	virtual void AttackEnd() override;
-
+	// virtual void DodgeEnd() override;
 	virtual bool CanAttack() override;
 	bool CanDisarm() const;
 	bool CanArm() const;
@@ -64,13 +65,28 @@ protected:
 	void Disarm();
 	void PlayEquipMontage(const FName& SectionName);
 	virtual void Die() override;
+	// bool HasEnoughStamina();
+	// bool IsOccupied();
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
+
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToHand();
 
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
+
+	// UFUNCTION(BlueprintCallable)
+	// void HitReactEnd();
+
 private:
+	// bool IsUnoccupied();
+	// void InitializeSlashOverlay();
+	// void SetHUDHealth();
+
+	/** Character components */
+
 	UPROPERTY(VisibleAnywhere);
 	USpringArmComponent* CameraBoom;
 
@@ -93,5 +109,11 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
-	
+
+	// UPROPERTY()
+	// USlashOverlay* SlashOverlay;
+
+public:
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 };
