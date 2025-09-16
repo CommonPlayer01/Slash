@@ -45,13 +45,13 @@ protected:
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
 	//virtual void PlayDodgeMontage();
-	//void StopAttackMontage();
+	void StopAttackMontage();
 
-	//UFUNCTION(BlueprintCallable)
-	//FVector GetTranslationWarpTarget();
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
 
-	//UFUNCTION(BlueprintCallable)
-	//FVector GetRotationWarpTarget();
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
@@ -71,8 +71,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = Combat)
 	AActor* CombatTarget;
 
-	//UPROPERTY(EditAnywhere, Category = Combat)
-	//double WarpTargetDistance = 75.f;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double WarpTargetDistance = 75.f;
 
 	UPROPERTY(BluePrintReadOnly)
 	TEnumAsByte<EDeathPose> DeathPose;

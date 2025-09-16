@@ -318,9 +318,9 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 
 	if(!IsDead())ShowHealthBar();
 	ClearPatrolTimer();
-
-
-
+	ClearAttackTimer();
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	StopAttackMontage();
 }
 
 void AEnemy::ShowHealthBar()
@@ -338,15 +338,18 @@ void AEnemy::ShowHealthBar()
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {	
 	HandleDamage(DamageAmount);
-	if (IsAlive()) {
-		CombatTarget = EventInstigator->GetPawn();
+	CombatTarget = EventInstigator->GetPawn();
+
+	if (IsInsideAttackRadius())
+	{
+		EnemyState = EEnemyState::EES_Attacking;
+	}
+	else if (IsOutsideAttackRadius())
+	{
 		ChaseTarget();
 	}
-	else {
-		EnemyState = EEnemyState::EES_Dead;
-	}
-	
-    return DamageAmount;
+
+	return DamageAmount;
 }
 
 void AEnemy::HandleDamage(float DamageAmount)
