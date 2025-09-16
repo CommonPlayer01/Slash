@@ -237,3 +237,176 @@ class YOURGAME_API AMyCharacter : public ACharacter, public IHitInterface
 3. 在命中逻辑中调用 `GetHit(ImpactPoint)` 触发反馈
 
 这样，你的角色就能在被击中时做出华丽的反应了！💥🎬🎮
+
+
+这是一个**非常棒、非常本质的问题**！👏
+
+你写的代码：
+
+```cpp
+IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
+if (HitInterface)
+{
+    HitInterface->Execute_GetHit(BoxHit.GetActor(), BoxHit.ImpactPoint, GetOwner());
+}
+```
+
+你问：
+
+> **既然我已经把 `BoxHit.GetActor()` 转成了 `HitInterface`，为什么调用 `Execute_GetHit` 时还要再传一次 `BoxHit.GetActor()`？这不是重复吗？**
+
+---
+
+## ✅ 简短回答：
+
+> **因为 `Execute_GetHit(...)` 是一个“静态辅助函数”，它不绑定任何对象实例 —— 它需要你手动告诉它“你要调用谁身上的接口函数”。**
+
+换句话说：
+
+- `HitInterface` 是一个 **接口指针**，它本身不“拥有”函数实现。
+- `Execute_GetHit(...)` 是一个 **全局静态函数**，它需要知道“在哪个对象上调用 `GetHit`”。
+
+---
+
+## 🧠 深入解释：Unreal Engine 接口系统的底层机制
+
+### 1. 什么是 `IHitInterface*`？
+
+```cpp
+IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
+```
+
+→ 这个 `HitInterface` **不是一个普通对象指针，而是一个“接口指针”**。
+
+在 C++ 底层，它其实是一个“指向虚函数表中接口部分”的指针，**它不直接对应一个 UObject 实例地址**。
+
+你**不能**像普通对象那样直接调用：
+
+```cpp
+HitInterface->GetHit(...); // ❌ 编译错误！UE 不允许你这样调用接口函数！
+```
+
+→ 因为 UE 的反射系统需要介入，以支持蓝图重写、网络复制、RPC 等功能。
+
+---
+
+### 2. 为什么必须用 `Execute_XXX`？
+
+Unreal 为每个 `UFUNCTION` 接口函数自动生成一个 **静态执行函数（Execute_XXX）**，例如：
+
+```cpp
+static void Execute_GetHit(UObject* Obj, const FVector& ImpactPoint, AActor* DamageCauser);
+```
+
+这个函数是**全局静态的**，不属于任何对象实例。
+
+所以你必须告诉它：
+
+> “嘿，`Execute_GetHit`，请在 `Obj` 这个对象上执行 `GetHit` 函数，参数是 XXX。”
+
+---
+
+### 3. 为什么不能自动推导对象？
+
+因为：
+
+- `IHitInterface*` 不是 `UObject*`，UE 的反射系统需要 `UObject*` 来查找类、蓝图、RPC 信息等。
+- 接口可以被任何 `UObject` 派生类实现（`AActor`, `UObject`, `UUserWidget`...），引擎需要明确知道“宿主对象”是谁。
+- 安全性：`Execute_` 函数内部会检查 `Obj` 是否有效、是否真的实现了该接口，避免崩溃。
+
+---
+
+## ✅ 正确理解调用方式
+
+你可以把这行代码：
+
+```cpp
+HitInterface->Execute_GetHit(BoxHit.GetActor(), BoxHit.ImpactPoint, GetOwner());
+```
+
+理解为：
+
+> “请调用 `BoxHit.GetActor()` 这个对象上的 `GetHit` 接口函数，参数是 `ImpactPoint` 和 `GetOwner()`。”
+
+虽然你已经有了 `HitInterface` 指针，但 UE 的架构要求你**显式传入对象实例**，这是设计上的“显式优于隐式”。
+
+---
+
+## 🆚 对比：如果是普通 C++ 接口（非 UINTERFACE）
+
+如果是纯 C++（非 Unreal 反射系统），你可以这样写：
+
+```cpp
+class IMyInterface
+{
+public:
+    virtual void GetHit(const FVector& ImpactPoint) = 0;
+};
+
+// 调用：
+IMyInterface* Ptr = Cast<IMyInterface>(Actor);
+if (Ptr)
+{
+    Ptr->GetHit(ImpactPoint); // ✅ 直接调用，不需要传对象
+}
+```
+
+→ **但在 Unreal 中，由于要支持蓝图、网络、反射，就不能这么干了！**
+
+---
+
+## 💡 类比理解
+
+想象 `Execute_GetHit` 是一个“电话接线员”：
+
+- 你（代码）告诉接线员：“我要找‘张三’，告诉他‘你被打了’。”
+- 你不能只说：“告诉那个接口，你被打了。” —— 接线员会问：“哪个接口？张三的？李四的？”
+- 所以你必须明确说：“找张三（BoxHit.GetActor()），告诉他（ImpactPoint, GetOwner()）。”
+
+---
+
+## ✅ 最佳实践 & 小技巧
+
+### 1. 用宏简化（可选）
+
+你可以定义一个宏，避免重复书写：
+
+```cpp
+#define EXECUTE_HIT_INTERFACE(Actor, Impact, Causer) \
+    if (IHitInterface* HI = Cast<IHitInterface>(Actor)) \
+    { \
+        HI->Execute_GetHit(Actor, Impact, Causer); \
+    }
+
+// 使用：
+EXECUTE_HIT_INTERFACE(BoxHit.GetActor(), BoxHit.ImpactPoint, GetOwner());
+```
+
+### 2. 安全封装成函数
+
+```cpp
+void UCombatLibrary::ApplyHit(AActor* Target, const FVector& ImpactPoint, AActor* DamageCauser)
+{
+    if (IHitInterface* HitInterface = Cast<IHitInterface>(Target))
+    {
+        HitInterface->Execute_GetHit(Target, ImpactPoint, DamageCauser);
+    }
+}
+```
+
+---
+
+## ✅ 总结
+
+> **你传 `BoxHit.GetActor()` 两次，不是因为代码冗余，而是因为 Unreal Engine 的接口系统设计如此 —— `Execute_XXX` 是静态函数，必须显式指定目标对象。**
+
+这是为了支持：
+
+- ✅ 蓝图重写
+- ✅ 网络复制
+- ✅ RPC 调用
+- ✅ 运行时安全检查
+
+你已经理解了 UE 接口机制的核心！🎯 这是迈向高级 Unreal 开发的重要一步！
+
+继续加油！💪
