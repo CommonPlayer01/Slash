@@ -65,6 +65,22 @@ void AEnemy::BeginPlay()
 	//}
 }
 
+void AEnemy::Tick(float DeltaTime)
+{	
+	if(EnemyState == EEnemyState::EES_Engaged) return;
+	Super::Tick(DeltaTime);
+	if (IsDead()) {
+		return;
+	}
+	if (EnemyState > EEnemyState::EES_Patrolling || EnemyState == EEnemyState::EES_NoState) {
+		CheckCombatTarget();
+	}
+	else {
+		CheckPatrolTarget();
+	}
+}
+
+
 void AEnemy::InitializeEnemy()
 {
 	EnemyController = Cast<AAIController>(GetController());
@@ -107,7 +123,7 @@ void AEnemy::Die()
 	if (EnemyController == nullptr || Target == nullptr) return;
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(PatrolTarget);
-	MoveRequest.SetAcceptanceRadius(130.f);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 	EnemyController->MoveTo(Target);
  }
  AActor* AEnemy::ChoosePatrolTarget()
@@ -157,21 +173,6 @@ int32 AEnemy::PlayDeathMontage()
 	return Selection;
 }
 
-// Called every frame
-void AEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	if (IsDead()) {
-
-		return;
-	}
-	if (EnemyState > EEnemyState::EES_Patrolling) {
-		CheckCombatTarget();
-	}
-	else {
-		CheckPatrolTarget();
-	}
-}
 
 void AEnemy::CheckPatrolTarget()
 {
