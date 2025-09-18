@@ -15,6 +15,7 @@ class UGroomComponent;
 class AItem;
 class AWeapon;
 class UAnimMontage;
+class USlashOverlay;
 
 
 
@@ -82,7 +83,7 @@ protected:
 
 private:
 	// bool IsUnoccupied();
-	// void InitializeSlashOverlay();
+	 void InitializeSlashOverlay();
 	// void SetHUDHealth();
 
 	/** Character components */
@@ -110,8 +111,8 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
 
-	// UPROPERTY()
-	// USlashOverlay* SlashOverlay;
+	UPROPERTY()
+	USlashOverlay* SlashOverlay;
 
 public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
