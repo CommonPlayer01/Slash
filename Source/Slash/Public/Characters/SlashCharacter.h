@@ -28,7 +28,7 @@ public:
 	ASlashCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// virtual void Jump() override;
+	virtual void Jump() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
@@ -67,7 +67,7 @@ protected:
 	void PlayEquipMontage(const FName& SectionName);
 	virtual void Die() override;
 	// bool HasEnoughStamina();
-	// bool IsOccupied();
+	bool IsOccupied();
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
@@ -84,7 +84,7 @@ protected:
 private:
 	// bool IsUnoccupied();
 	 void InitializeSlashOverlay();
-	// void SetHUDHealth();
+	void SetHUDHealth();
 
 	/** Character components */
 
