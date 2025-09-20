@@ -107,6 +107,22 @@ void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	}
 }
 
+void ASlashCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void ASlashCharacter::AddSouls(ASoul* Soul)
+{	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Add soul"));
+	//if (Attributes && SlashOverlay)
+	//{
+	//	Attributes->AddSouls(Soul->GetSouls());
+	//	SlashOverlay->SetSouls(Attributes->GetSouls());
+	//}
+
+}
+
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {
 	Super::SetWeaponCollisionEnabled(CollisionEnabled);
 }

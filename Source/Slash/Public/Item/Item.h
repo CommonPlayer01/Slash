@@ -24,25 +24,24 @@ public:
 	AItem();
 	virtual void Tick(float DeltaTime) override;
 
-	float TransformedSin();
-	float TransformedCos();
-
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* Sphere;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UPROPERTY(EditDefaultsOnly);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters");
 	float Amplitude = 0.25f;
 
-
-
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Sine Parameters");
-
 	float TimeConstant = 5.0f;
+
+	UFUNCTION(BlueprintPure)
+	float TransformedSin();
+
+	UFUNCTION(BlueprintPure)
+	float TransformedCos();
+
+	template<typename T>
+	T Avg(T First, T Second);
 
 	UFUNCTION()
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -50,11 +49,17 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	// virtual void SpawnPickupSystem();
+	// virtual void SpawnPickupSound();
+
+	EItemState ItemState = EItemState::EIS_Hovering;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* Sphere;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
 
-	EItemState ItemState = EItemState::EIS_Hovering;
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* EmbersEffect;
@@ -63,4 +68,13 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
 	float RunningTime;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* PickupEffect;
 };
+
+template<typename T>
+inline T AItem::Avg(T First, T Second)
+{
+	return (First + Second) / 2;
+}
+

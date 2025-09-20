@@ -6,6 +6,7 @@
 #include "Characters/CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "Characters/BaseCharacter.h"
+#include "Interface/PickupInterface.h"
 #include "SlashCharacter.generated.h"
 
 
@@ -16,11 +17,11 @@ class AItem;
 class AWeapon;
 class UAnimMontage;
 class USlashOverlay;
-
+class ASoul;
 
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ABaseCharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -32,8 +33,8 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
-	void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
-	// virtual void AddSouls(ASoul* Soul) override;
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddSouls(ASoul* Soul) override;
 	// virtual void AddGold(ATreasure* Treasure) override;
 
 

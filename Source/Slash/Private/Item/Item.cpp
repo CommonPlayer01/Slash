@@ -8,7 +8,7 @@
 #include "Slash/Slash.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
-#include "Characters/SlashCharacter.h"
+#include "Interface/PickupInterface.h"
 #include "Niagaracomponent.h"
 
 // Sets default values
@@ -103,16 +103,16 @@ void AItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	FString ComponentName = OverlappedComponent->GetName();
 	if(GEngine) {
 		
-		//FString Message = FString::Printf(TEXT("AItem %s Component Begin Overlap with %s %s"), *ComponentName, *OtherActorName, *OtherComponentName);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
-		// UE_LOG(LogTemp, Warning, TEXT("Item Sphere Begin Overlap with %s"), *ComponentName);
+		FString Message = FString::Printf(TEXT("AItem %s Component Begin Overlap with %s %s"), *ComponentName, *OtherActorName, *OtherComponentName);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+		 //UE_LOG(LogTemp, Warning, TEXT("Item Sphere Begin Overlap with %s"), *ComponentName);
 	}
 
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
-	if (SlashCharacter) {
+	IPickupInterface* HitInterface = Cast<IPickupInterface>(OtherActor);
+	if (HitInterface) {
 		//FString Message = FString::Printf(TEXT("Cast to SlashCharacter sucess"));
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
-		SlashCharacter->SetOverlappingItem(this);
+		HitInterface->SetOverlappingItem(this);
 	}
 }
 
@@ -121,12 +121,19 @@ void AItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 //DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FComponentEndOverlapSignature, UPrimitiveComponent, OnComponentEndOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex);
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	const FString OtherActorName = OtherActor->GetName();
-	UE_LOG(LogTemp, Warning, TEXT("Sphere End Overlap"));
+	//const FString OtherActorName = OtherActor->GetName();
+	//UE_LOG(LogTemp, Warning, TEXT("Sphere End Overlap"));
 
-	if(GEngine) {
-		/*FString Message = FString::Printf(TEXT("Sphere End Overlap with %s"), *OtherActorName);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Message);*/
-		UE_LOG(LogTemp, Warning, TEXT("Sphere End Overlap with %s"), *OtherActorName);
+	//if(GEngine) {
+	//	/*FString Message = FString::Printf(TEXT("Sphere End Overlap with %s"), *OtherActorName);
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Message);*/
+	//	UE_LOG(LogTemp, Warning, TEXT("Sphere End Overlap with %s"), *OtherActorName);
+	//}
+
+	IPickupInterface* HitInterface = Cast<IPickupInterface>(OtherActor);
+	if (HitInterface) {
+		//FString Message = FString::Printf(TEXT("Cast to SlashCharacter sucess"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+		HitInterface->SetOverlappingItem(nullptr);
 	}
 }
