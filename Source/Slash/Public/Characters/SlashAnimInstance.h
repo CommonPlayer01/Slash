@@ -25,9 +25,14 @@ public:
 	float GroundSpeed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	bool isFalling;
+	bool IsFalling;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	EActionState ActionState;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	TEnumAsByte<EDeathPose> DeathPose;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement | CharacterState")
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
-
 };

@@ -19,14 +19,13 @@ void USlashAnimInstance::NativeInitializeAnimation() {
 
 void USlashAnimInstance::NativeUpdateAnimation(float DeltaTime){
 	Super::NativeUpdateAnimation(DeltaTime);
-	if(SlashCharacterMovement) {
-		//GroundSpeed = SlashCharacterMovement->Velocity.Size();
+	if (SlashCharacterMovement)
+	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(SlashCharacterMovement->Velocity);
-		isFalling = SlashCharacterMovement->IsFalling();
+		IsFalling = SlashCharacterMovement->IsFalling();
 		CharacterState = SlashCharacter->GetCharacterState();
-	}
-	else {
-		GroundSpeed = 0.0f;
+		ActionState = SlashCharacter->GetActionState();
+		DeathPose = SlashCharacter->GetDeathPose();
 	}
 
 }

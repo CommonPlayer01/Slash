@@ -78,12 +78,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 
-	 UFUNCTION(BlueprintCallable)
-	 void HitReactEnd();
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
 
 private:
-	// bool IsUnoccupied();
-	 void InitializeSlashOverlay();
+	bool IsUnoccupied();
+	void InitializeSlashOverlay();
 	void SetHUDHealth();
 
 	/** Character components */

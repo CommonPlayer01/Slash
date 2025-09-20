@@ -38,7 +38,7 @@ protected:
 	void DisableCapsule();
 	virtual bool CanAttack();
 	bool IsAlive();
-	//void DisableMeshCollision();
+	void DisableMeshCollision();
 
 	/** Montage */
 	void PlayHitReactMontage(const FName& SectionName);
@@ -104,4 +104,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> DeathMontageSections;
+
+public:
+	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }
 };

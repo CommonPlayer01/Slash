@@ -12,6 +12,7 @@
 #include "Components/AttributeComponent.h"
 #include "HUD/SlashHUD.h"
 #include "HUD/SlashOverlay.h"
+#include "Characters/CharacterTypes.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
@@ -56,7 +57,9 @@ void ASlashCharacter::BeginPlay()
 
 void ASlashCharacter::Die()
 {
-
+	Super::Die();
+	ActionState = EActionState::EAS_Dead;
+	DisableMeshCollision();
 }
 
 // Called every frame
@@ -98,7 +101,10 @@ float ASlashCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-	ActionState = EActionState::EAS_HitReaction;
+	if (Attributes && Attributes->GetHealthPercent() > 0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
 }
 
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) {

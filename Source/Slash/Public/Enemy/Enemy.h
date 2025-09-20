@@ -56,7 +56,6 @@ protected:
 
 
 
-	virtual int32 PlayDeathMontage() override;
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 

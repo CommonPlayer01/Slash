@@ -37,7 +37,8 @@ void ABaseCharacter::Attack() {
 }
 
 void ABaseCharacter::Die() {
-
+	Tags.Add(FName("Dead"));
+	PlayDeathMontage();
 }	
 
 void ABaseCharacter::Tick(float DeltaTime)
@@ -50,8 +51,8 @@ void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName& Sect
 {	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && Montage) {
-		AnimInstance->Montage_Play(AttackMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+		AnimInstance->Montage_Play(Montage);
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
 	}
 }
 
@@ -191,4 +192,7 @@ void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collision
 	}
 }
 
-
+void ABaseCharacter::DisableMeshCollision()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
